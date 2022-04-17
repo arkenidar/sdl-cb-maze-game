@@ -23,7 +23,7 @@ int in_rect(int x, int y, struct SDL_Rect *r) {
   return (x >= r->x) && (y >= r->y) &&
           (x < r->x + r->w) && (y < r->y + r->h);
 }
-int main( int argc, char * argv[] )
+int main(int argc, char* argv[])
 {
   ensure( SDL_Init( SDL_INIT_VIDEO | SDL_INIT_TIMER ) );
   int view_width=400, view_height=300;
@@ -84,3 +84,24 @@ int main( int argc, char * argv[] )
   SDL_Quit();
   return 0;
 }
+
+
+//==========================================
+
+// . sdl-cross-compile.sh
+// wine sdl-app.exe
+
+#if defined(_WIN64)
+
+#include <windows.h>
+
+int WINAPI WinMain( HINSTANCE hInstance,    // HANDLE TO AN INSTANCE.  This is the "handle" to YOUR PROGRAM ITSELF.
+                    HINSTANCE hPrevInstance,// USELESS on modern windows (totally ignore hPrevInstance)
+                    LPSTR szCmdLine,        // Command line arguments.  similar to argv in standard C programs
+                    int iCmdShow )          // Start window maximized, minimized, etc.
+{
+  char* argv[]={"main-sdl"};
+  return main(1,argv);
+}
+
+#endif

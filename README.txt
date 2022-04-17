@@ -12,3 +12,6 @@ Shell scripts to be used in Linux to produce Microsoft Windows apps, via MinGW (
 
 /sh-linux
 Shell scripts to be used in Linux to produce Linux apps, via GCC (notably with support for libSDL2)
+
+/sh-mswindows
+Shell scripts to be used in Microsoft Windows to produce Microsoft Windows apps, via GCC/MinGW/MSYS (notably with support for libSDL2)

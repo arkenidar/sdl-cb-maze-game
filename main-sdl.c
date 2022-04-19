@@ -48,9 +48,9 @@ void draw_colors(SDL_Renderer * renderer, int i_current, int view_width, int vie
   int* color;
   SDL_Rect rectangle;
 
+  int background_color[] = { 50, 50, 50 };
   for(int i = -1 ; i <= i_current ; i++ ){
     if(i==-1){
-      int background_color[] = { 50, 50, 50 };
       color = background_color;
       SDL_Rect view={.x=0,.y=0,.w=view_width,.h=view_height};
       rectangle = view;

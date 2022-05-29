@@ -65,14 +65,15 @@ void draw_colors(SDL_Renderer * renderer, int i_current, int view_width, int vie
 }
 
 // simpler
-int main(){
+int main(int argc, char* argv[]){
     ensure( SDL_Init( SDL_INIT_VIDEO | SDL_INIT_TIMER ) );
     int view_width=400, view_height=300;
     SDL_Window * window;
     SDL_Renderer * renderer;
     ensure( SDL_CreateWindowAndRenderer( view_width, view_height, SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE, &window, &renderer ) );
 
-    int x=0;
+    double x1=0;
+    double x2=0;
 
     int lastTime = SDL_GetTicks(), currentTime;
     while(events()){
@@ -83,12 +84,19 @@ int main(){
         SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
         SDL_RenderClear(renderer);
 
-        x+=dt/2;
-        x%=100;
-        SDL_Rect button={.x=x,.y=10,.w=50,.h=50};
+        x1+=dt*0.01;
+        if(x1>150) x1=0;
+        SDL_Rect button1={.x=x1,.y=10,.w=50,.h=50};
         int button_color[] = { 0, 50, 50 };
         SDL_SetRenderDrawColor( renderer, button_color[0], button_color[1], button_color[2], 255 );
-        SDL_RenderFillRect( renderer, &button );
+        SDL_RenderFillRect( renderer, &button1 );
+
+        x2+=dt*0.08;
+        if(x2>150) x2=0;
+        SDL_Rect button2={.x=x2,.y=10,.w=50,.h=50};
+        //int button_color[] = { 0, 50, 50 };
+        SDL_SetRenderDrawColor( renderer, button_color[0], button_color[1], button_color[2], 255 );
+        SDL_RenderFillRect( renderer, &button2 );
 
         SDL_RenderPresent( renderer );
     }

@@ -1,0 +1,6 @@
+# depslib dependency file v1.0
+1653815953 source:c:\users\dario\onedrive\desktop\sdl-cb\main-sdl.c
+	<SDL2/SDL.h>
+	<stdio.h>
+	<windows.h>
+

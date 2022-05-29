@@ -63,7 +63,44 @@ void draw_colors(SDL_Renderer * renderer, int i_current, int view_width, int vie
     SDL_RenderFillRect( renderer, &rectangle );
   }
 }
-int main(int argc, char* argv[])
+
+// simpler
+int main(){
+    ensure( SDL_Init( SDL_INIT_VIDEO | SDL_INIT_TIMER ) );
+    int view_width=400, view_height=300;
+    SDL_Window * window;
+    SDL_Renderer * renderer;
+    ensure( SDL_CreateWindowAndRenderer( view_width, view_height, SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE, &window, &renderer ) );
+
+    int x=0;
+
+    int lastTime = SDL_GetTicks(), currentTime;
+    while(events()){
+        currentTime = SDL_GetTicks();
+        int dt = currentTime - lastTime;
+        lastTime = currentTime;
+
+        SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
+        SDL_RenderClear(renderer);
+
+        x+=dt/2;
+        x%=100;
+        SDL_Rect button={.x=x,.y=10,.w=50,.h=50};
+        int button_color[] = { 0, 50, 50 };
+        SDL_SetRenderDrawColor( renderer, button_color[0], button_color[1], button_color[2], 255 );
+        SDL_RenderFillRect( renderer, &button );
+
+        SDL_RenderPresent( renderer );
+    }
+
+    SDL_DestroyWindow( window );
+    SDL_DestroyRenderer( renderer );
+    SDL_Quit();
+    return 0;
+}
+
+// more advanced
+int main1(int argc, char* argv[])
 {
   ensure( SDL_Init( SDL_INIT_VIDEO | SDL_INIT_TIMER ) );
   int view_width=400, view_height=300;

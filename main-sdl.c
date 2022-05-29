@@ -84,7 +84,7 @@ int main(int argc, char* argv[]){
         SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
         SDL_RenderClear(renderer);
 
-        x1+=dt*0.01;
+        x1+=dt*0.02;
         if(x1>150) x1=0;
         SDL_Rect button1={.x=x1,.y=10,.w=50,.h=50};
         int button_color[] = { 0, 50, 50 };
@@ -93,7 +93,7 @@ int main(int argc, char* argv[]){
 
         x2+=dt*0.08;
         if(x2>150) x2=0;
-        SDL_Rect button2={.x=x2,.y=10,.w=50,.h=50};
+        SDL_Rect button2={.x=x2,.y=10+50+10,.w=50,.h=50};
         //int button_color[] = { 0, 50, 50 };
         SDL_SetRenderDrawColor( renderer, button_color[0], button_color[1], button_color[2], 255 );
         SDL_RenderFillRect( renderer, &button2 );

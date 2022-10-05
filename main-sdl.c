@@ -64,8 +64,10 @@ void draw_colors(SDL_Renderer * renderer, int i_current, int view_width, int vie
   }
 }
 
-// simpler
-int main(int argc, char* argv[]){
+#define main1 main
+
+// simpler (second app)
+int main2(int argc, char* argv[]){
     ensure( SDL_Init( SDL_INIT_VIDEO | SDL_INIT_TIMER ) );
     int view_width=400, view_height=300;
     SDL_Window * window;
@@ -107,7 +109,7 @@ int main(int argc, char* argv[]){
     return 0;
 }
 
-// more advanced
+// more advanced (first app)
 int main1(int argc, char* argv[])
 {
   ensure( SDL_Init( SDL_INIT_VIDEO | SDL_INIT_TIMER ) );

@@ -64,7 +64,39 @@ void draw_colors(SDL_Renderer * renderer, int i_current, int view_width, int vie
   }
 }
 
-#define main1 main
+#define main3 main
+
+// images (third app)
+int main3(int argc, char* argv[]){
+    ensure( SDL_Init( SDL_INIT_VIDEO ) );
+    int view_width=400, view_height=300;
+    SDL_Window * window;
+    SDL_Renderer * renderer;
+    ensure( SDL_CreateWindowAndRenderer( view_width, view_height, SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE, &window, &renderer ) );
+
+    SDL_Surface * image = SDL_LoadBMP("assets/P.bmp");
+    SDL_Texture * texture = SDL_CreateTextureFromSurface(renderer, image);
+
+    while(events()){
+        SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
+        SDL_RenderClear(renderer);
+
+        SDL_Rect dst_rect = { 5, 15, 100, 100 };
+        SDL_RenderCopy(renderer, texture, NULL, &dst_rect);
+
+        //SDL_RenderCopy(renderer, texture, NULL, NULL);
+
+        SDL_RenderPresent( renderer );
+    }
+
+    SDL_DestroyTexture(texture);
+    SDL_FreeSurface(image);
+    SDL_DestroyRenderer(renderer);
+    SDL_DestroyWindow(window);
+
+    SDL_Quit();
+    return 0;
+}
 
 // simpler (second app)
 int main2(int argc, char* argv[]){

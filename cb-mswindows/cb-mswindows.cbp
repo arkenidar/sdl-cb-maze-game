@@ -42,9 +42,6 @@
 			<Add library="dxguid" />
 			<Add directory="C:/Users/dario/Dropbox/code/c-based/libsdl2/SDL2-2.0.20/x86_64-w64-mingw32/lib" />
 		</Linker>
-		<ExtraCommands>
-			<Add after="XCOPY $(#sdl2)\bin\*.dll $(TARGET_OUTPUT_DIR) /D /Y" />
-		</ExtraCommands>
 		<Unit filename="../main-sdl.c">
 			<Option compilerVar="CC" />
 		</Unit>

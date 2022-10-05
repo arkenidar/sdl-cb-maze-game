@@ -35,9 +35,18 @@
 		<Linker>
 			<Add option="`sdl2-config --libs`" />
 		</Linker>
+		<Unit filename="../assets/-.bmp" />
+		<Unit filename="../assets/E.bmp" />
+		<Unit filename="../assets/P.bmp" />
+		<Unit filename="../assets/README.txt" />
+		<Unit filename="../assets/W.bmp" />
+		<Unit filename="../assets/map01.txt" />
+		<Unit filename="../assets/map02.txt" />
+		<Unit filename="../assets/map03.txt" />
 		<Unit filename="../main-sdl.c">
 			<Option compilerVar="CC" />
 		</Unit>
+		<Unit filename="../main.lua" />
 		<Extensions />
 	</Project>
 </CodeBlocks_project_file>

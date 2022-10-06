@@ -95,12 +95,17 @@ int main3(int argc, char* argv[]){
     image[i] = SDL_LoadBMP(filename[i]);
     texture[i] = SDL_CreateTextureFromSurface(renderer, image[i]);
     }
+
+    int tile_type = 0;
     while(events()){
+
+        if(mouse_down) tile_type = (tile_type+1)%count;
+
         SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
         SDL_RenderClear(renderer);
 
         SDL_Rect dst_rect = { 5, 15, 100, 100 };
-        SDL_RenderCopy(renderer, texture[0], NULL, &dst_rect);
+        SDL_RenderCopy(renderer, texture[tile_type], NULL, &dst_rect);
 
         SDL_RenderPresent( renderer );
     }

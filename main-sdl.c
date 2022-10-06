@@ -74,9 +74,16 @@ int main3(int argc, char* argv[]){
     SDL_Renderer * renderer;
     ensure( SDL_CreateWindowAndRenderer( view_width, view_height, SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE, &window, &renderer ) );
 
+    char * filename[4]={
+        "assets/P.bmp",
+        "assets/-.bmp",
+        "assets/W.bmp",
+        "assets/E.bmp"
+    };
+
     SDL_Surface * image[4];
     SDL_Texture * texture[4];
-    image[0] = SDL_LoadBMP("assets/P.bmp");
+    image[0] = SDL_LoadBMP(filename[0]);
     texture[0] = SDL_CreateTextureFromSurface(renderer, image[0]);
 
     while(events()){

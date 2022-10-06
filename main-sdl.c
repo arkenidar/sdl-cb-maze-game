@@ -74,23 +74,23 @@ int main3(int argc, char* argv[]){
     SDL_Renderer * renderer;
     ensure( SDL_CreateWindowAndRenderer( view_width, view_height, SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE, &window, &renderer ) );
 
-    SDL_Surface * image = SDL_LoadBMP("assets/P.bmp");
-    SDL_Texture * texture = SDL_CreateTextureFromSurface(renderer, image);
+    SDL_Surface * image[4];
+    SDL_Texture * texture[4];
+    image[0] = SDL_LoadBMP("assets/P.bmp");
+    texture[0] = SDL_CreateTextureFromSurface(renderer, image[0]);
 
     while(events()){
         SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
         SDL_RenderClear(renderer);
 
         SDL_Rect dst_rect = { 5, 15, 100, 100 };
-        SDL_RenderCopy(renderer, texture, NULL, &dst_rect);
-
-        //SDL_RenderCopy(renderer, texture, NULL, NULL);
+        SDL_RenderCopy(renderer, texture[0], NULL, &dst_rect);
 
         SDL_RenderPresent( renderer );
     }
 
-    SDL_DestroyTexture(texture);
-    SDL_FreeSurface(image);
+    SDL_DestroyTexture(texture[0]);
+    SDL_FreeSurface(image[0]);
     SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(window);
 

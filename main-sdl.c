@@ -13,18 +13,22 @@ void ensure(int return_code){
     printf("error initializing SDL: %s\n", SDL_GetError());
 }
 
-int mouse_down;
+int mx, my; Uint32 mbuttons;
+int mouse_left_down, mouse_left_just_down, mouse_left_down_previous=0;
 
 int events(){
-  mouse_down = 0;
+
+SDL_PumpEvents();
+mbuttons = SDL_GetMouseState(&mx, &my);
+
+mouse_left_down = mbuttons & SDL_BUTTON_LMASK;
+mouse_left_just_down = mouse_left_down && ! mouse_left_down_previous;
+mouse_left_down_previous = mouse_left_down;
 
   SDL_Event event;
   while (SDL_PollEvent(&event)) {
     switch (event.type) {
       case SDL_QUIT: return 0;
-
-      case SDL_MOUSEBUTTONDOWN:
-        mouse_down = 1;
     }
   }
   return 1;
@@ -109,10 +113,7 @@ int main3(int argc, char* argv[]){
     texture[i] = SDL_CreateTextureFromSurface(renderer, image[i]);
     }
 
-    int tile_type = 0;
     while(events()){
-
-        if(mouse_down) tile_type = (tile_type+1)%count;
 
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
         SDL_RenderClear(renderer);

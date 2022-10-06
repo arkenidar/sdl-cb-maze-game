@@ -80,12 +80,14 @@ int main3(int argc, char* argv[]){
         "assets/W.bmp",
         "assets/E.bmp"
     };
+    const int count=4;
 
-    SDL_Surface * image[4];
-    SDL_Texture * texture[4];
-    image[0] = SDL_LoadBMP(filename[0]);
-    texture[0] = SDL_CreateTextureFromSurface(renderer, image[0]);
-
+    SDL_Surface * image[count];
+    SDL_Texture * texture[count];
+    for(int i=0; i<count; i++){
+    image[i] = SDL_LoadBMP(filename[i]);
+    texture[i] = SDL_CreateTextureFromSurface(renderer, image[i]);
+    }
     while(events()){
         SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
         SDL_RenderClear(renderer);
@@ -96,8 +98,10 @@ int main3(int argc, char* argv[]){
         SDL_RenderPresent( renderer );
     }
 
-    SDL_DestroyTexture(texture[0]);
-    SDL_FreeSurface(image[0]);
+    for(int i=0; i<count; i++){
+    SDL_DestroyTexture(texture[i]);
+    SDL_FreeSurface(image[i]);
+    }
     SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(window);
 

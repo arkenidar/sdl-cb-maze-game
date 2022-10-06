@@ -73,6 +73,17 @@ void draw_colors(SDL_Renderer * renderer, int i_current, int view_width, int vie
 
 #define main3 main
 
+char * map01[] = {
+"P##   #",
+"  # E #",
+"# #   #",
+"  #   #",
+"      #",
+"#######"
+};
+
+char * * map = map01;
+
 // images (third app)
 int main3(int argc, char* argv[]){
     ensure( SDL_Init( SDL_INIT_VIDEO ) );

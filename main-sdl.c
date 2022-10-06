@@ -90,6 +90,8 @@ int map_width=7, map_height=6;
 
 char * * map = map01;
 
+int px=0, py=0;
+
 // images (third app)
 int main3(int argc, char* argv[]){
     ensure( SDL_Init( SDL_INIT_VIDEO ) );
@@ -114,14 +116,31 @@ int main3(int argc, char* argv[]){
     }
 
     while(events()){
+        const tile_size=32;
+
+        if(mouse_left_down){
+            int tx,ty;
+            tx=mx/tile_size;
+            ty=my/tile_size;
+            if(tx<map_width && ty<map_height){
+                if(
+                   (abs(tx-px)==1 && ty==py)
+                    || (abs(ty-py)==1 && tx==px)){
+                    char going=map[ty][tx];
+                    if(going != '#'){
+                        px=tx; py=ty;
+                    }
+                }
+            }
+        }
 
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
         SDL_RenderClear(renderer);
 
-        int tile_size=32;
         for(int yi=0; yi<map_height; yi++)
         for(int xi=0; xi<map_width; xi++){
         char map_char = map[yi][xi];
+        if(yi==py && xi==px) map_char='P';
         int map_tile_type = 1;
         switch(map_char){
             case 'P': map_tile_type=0; break;

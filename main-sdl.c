@@ -13,11 +13,18 @@ void ensure(int return_code){
     printf("error initializing SDL: %s\n", SDL_GetError());
 }
 
+int mouse_down;
+
 int events(){
+  mouse_down = 0;
+
   SDL_Event event;
   while (SDL_PollEvent(&event)) {
     switch (event.type) {
       case SDL_QUIT: return 0;
+
+      case SDL_MOUSEBUTTONDOWN:
+        mouse_down = 1;
     }
   }
   return 1;

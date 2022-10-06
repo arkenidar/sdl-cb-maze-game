@@ -82,6 +82,8 @@ char * map01[] = {
 "#######"
 };
 
+int map_width=7, map_height=6;
+
 char * * map = map01;
 
 // images (third app)
@@ -112,11 +114,23 @@ int main3(int argc, char* argv[]){
 
         if(mouse_down) tile_type = (tile_type+1)%count;
 
-        SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
+        SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
         SDL_RenderClear(renderer);
 
-        SDL_Rect dst_rect = { 5, 15, 100, 100 };
-        SDL_RenderCopy(renderer, texture[tile_type], NULL, &dst_rect);
+        int tile_size=32;
+        for(int yi=0; yi<map_height; yi++)
+        for(int xi=0; xi<map_width; xi++){
+        char map_char = map[yi][xi];
+        int map_tile_type = 1;
+        switch(map_char){
+            case 'P': map_tile_type=0; break;
+            case ' ': map_tile_type=1; break;
+            case '#': map_tile_type=2; break;
+            case 'E': map_tile_type=3; break;
+        }
+        SDL_Rect dst_rect = { xi*tile_size, yi*tile_size, tile_size, tile_size };
+        SDL_RenderCopy(renderer, texture[map_tile_type], NULL, &dst_rect);
+        }
 
         SDL_RenderPresent( renderer );
     }

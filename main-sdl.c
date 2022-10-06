@@ -13,18 +13,22 @@ void ensure(int return_code){
     printf("error initializing SDL: %s\n", SDL_GetError());
 }
 
-int mouse_down;
+int mx, my; Uint32 mbuttons;
+int mouse_left_down, mouse_left_just_down, mouse_left_down_previous=0;
 
 int events(){
-  mouse_down = 0;
+
+SDL_PumpEvents();
+mbuttons = SDL_GetMouseState(&mx, &my);
+
+mouse_left_down = mbuttons & SDL_BUTTON_LMASK;
+mouse_left_just_down = mouse_left_down && ! mouse_left_down_previous;
+mouse_left_down_previous = mouse_left_down;
 
   SDL_Event event;
   while (SDL_PollEvent(&event)) {
     switch (event.type) {
       case SDL_QUIT: return 0;
-
-      case SDL_MOUSEBUTTONDOWN:
-        mouse_down = 1;
     }
   }
   return 1;
@@ -73,20 +77,66 @@ void draw_colors(SDL_Renderer * renderer, int i_current, int view_width, int vie
 
 #define main3 main
 
-char * map01[] = {
-"P##   #",
-"  # E #",
-"# #   #",
-"  #   #",
-"      #",
-"#######"
+int px=0, py=0;
+
+char * worlds[] = {
+"assets/map01.txt",
+"assets/map02.txt",
+"assets/map03.txt"
 };
+int worlds_current = -1;
 
-int map_width=7, map_height=6;
+typedef struct map_struct {
+    int width, height;
+    char * * matrix;
+} Map;
 
-char * * map = map01;
+void map_unload(Map * map){
+    for(int i=0; i < map->height; i++)
+        free(map->matrix[i]);
+    free(map->matrix);
 
-// images (third app)
+    map->matrix=NULL;
+    map->width=0;
+    map->height=0;
+}
+
+void map_post_load(Map * map){
+    for(int yi=0; yi < map->height; yi++)
+    for(int xi=0; xi < map->width; xi++){
+        char map_char = map->matrix[yi][xi];
+        if(map_char=='P'){
+            map->matrix[yi][xi] = ' ';
+            px=xi; py=yi;
+        }
+    }
+}
+
+void map_load(Map * map, char* file_path){
+    map_unload(map);
+    int map_width = -1; int map_height = 0;
+    char * * map_matrix = (char * *) calloc(1,sizeof(char*));
+    FILE* file = fopen(file_path,"r");
+    char line[1001];
+    while(fgets(line,1001,file)){
+        if(map_width==-1) map_width = strlen(line) - 1;
+        line[map_width]='\0';
+
+        map_height += 1;
+
+        map_matrix = (char * *) realloc(map_matrix, sizeof(char*) * map_height);
+        map_matrix[map_height - 1] = calloc(map_width+1,sizeof(char));
+        strcpy(map_matrix[map_height - 1],line);
+    }
+
+    map->height = map_height;
+    map->width = map_width;
+    map->matrix = map_matrix;
+
+    map_post_load(map);
+}
+
+// maze/images (third app)
 int main3(int argc, char* argv[]){
     ensure( SDL_Init( SDL_INIT_VIDEO ) );
     int view_width=400, view_height=300;
@@ -109,18 +159,37 @@ int main3(int argc, char* argv[]){
     texture[i] = SDL_CreateTextureFromSurface(renderer, image[i]);
     }
 
-    int tile_type = 0;
-    while(events()){
+    Map map = { .matrix=NULL, .height=0 };
 
-        if(mouse_down) tile_type = (tile_type+1)%count;
+    map_load(&map,worlds[++worlds_current]);
+
+    while(events()){
+        const int tile_size=32;
+
+        if(mouse_left_down){
+            int tx,ty;
+            tx=mx/tile_size;
+            ty=my/tile_size;
+            if(tx<map.width && ty<map.height){
+                if(
+                   (abs(tx-px)==1 && ty==py)
+                    || (abs(ty-py)==1 && tx==px)){
+                    char going=map.matrix[ty][tx];
+                    if(going != '#'){
+                        px=tx; py=ty;
+                        if(going == 'E') map_load(&map,worlds[++worlds_current]);
+                    }
+                }
+            }
+        }
 
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
         SDL_RenderClear(renderer);
 
-        int tile_size=32;
-        for(int yi=0; yi<map_height; yi++)
-        for(int xi=0; xi<map_width; xi++){
-        char map_char = map[yi][xi];
+        for(int yi=0; yi<map.height; yi++)
+        for(int xi=0; xi<map.width; xi++){
+        char map_char = map.matrix[yi][xi];
+        if(yi==py && xi==px) map_char='P';
         int map_tile_type = 1;
         switch(map_char){
             case 'P': map_tile_type=0; break;
@@ -134,6 +203,8 @@ int main3(int argc, char* argv[]){
 
         SDL_RenderPresent( renderer );
     }
+
+    map_unload(&map);
 
     for(int i=0; i<count; i++){
     SDL_DestroyTexture(texture[i]);

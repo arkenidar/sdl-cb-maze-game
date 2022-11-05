@@ -144,6 +144,8 @@ int main3(int argc, char* argv[]){
     SDL_Renderer * renderer;
     ensure( SDL_CreateWindowAndRenderer( view_width, view_height, SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE, &window, &renderer ) );
 
+    SDL_SetWindowTitle(window, "mini-maze with (lib)SDL2");
+
     char * filename[4]={
         "assets/P.bmp",
         "assets/-.bmp",

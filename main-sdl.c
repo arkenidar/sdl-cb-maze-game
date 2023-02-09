@@ -158,6 +158,10 @@ int main3(int argc, char* argv[]){
     SDL_Texture * texture[count];
     for(int i=0; i<count; i++){
     image[i] = SDL_LoadBMP(filename[i]);
+    if(image[i]==NULL){
+        printf("file-name not found: [[ %s ]]\n",filename[i]);
+        return 1;
+    }
     texture[i] = SDL_CreateTextureFromSurface(renderer, image[i]);
     }
 

@@ -8,73 +8,6 @@
 #include <SDL2/SDL.h>
 #include <stdio.h>
 
-void ensure(int return_code){
-  if(return_code != 0)
-    printf("error initializing SDL: %s\n", SDL_GetError());
-}
-
-int mx, my; Uint32 mbuttons;
-int mouse_left_down, mouse_left_just_down, mouse_left_down_previous=0;
-
-int events(){
-
-SDL_PumpEvents();
-mbuttons = SDL_GetMouseState(&mx, &my);
-
-mouse_left_down = mbuttons & SDL_BUTTON_LMASK;
-mouse_left_just_down = mouse_left_down && ! mouse_left_down_previous;
-mouse_left_down_previous = mouse_left_down;
-
-  SDL_Event event;
-  while (SDL_PollEvent(&event)) {
-    switch (event.type) {
-      case SDL_QUIT: return 0;
-    }
-  }
-  return 1;
-}
-
-int in_rect(int x, int y, struct SDL_Rect *r) {
-  return (x >= r->x) && (y >= r->y) &&
-          (x < r->x + r->w) && (y < r->y + r->h);
-}
-
-  int rgb[][3] = {
-  {203, 203, 203}, // Gray
-  {254, 254,  31}, // Yellow
-  {0,   255, 255}, // Cyan
-  {0,     0,   0}, // Black
-  {0,   254,  30}, // Green
-  {255,  16, 253}, // Magenta
-  {253,   3,   2}, // Red
-  {18,   14, 252}  // Blue
-  };
-  int rgb_size = sizeof rgb / sizeof rgb[0];
-
-void draw_colors(SDL_Renderer * renderer, int i_current, int view_width, int view_height){
-
-  SDL_Rect colorBar;
-  colorBar.x = 0; colorBar.y = 0; colorBar.w = view_width/rgb_size; colorBar.h = view_height;
-
-  int* color;
-  SDL_Rect rectangle;
-
-  int background_color[] = { 50, 50, 50 };
-  for(int i = -1 ; i <= i_current ; i++ ){
-    if(i==-1){
-      color = background_color;
-      SDL_Rect view={.x=0,.y=0,.w=view_width,.h=view_height};
-      rectangle = view;
-    }else{
-      color = rgb[i];
-      colorBar.x = i*colorBar.w;
-      rectangle = colorBar;
-    }
-    SDL_SetRenderDrawColor( renderer, color[0], color[1], color[2], 255 );
-    SDL_RenderFillRect( renderer, &rectangle );
-  }
-}
-
 #define main3 main
 
 int px=0, py=0;
@@ -90,6 +23,8 @@ typedef struct map_struct {
     int width, height;
     char * * matrix;
 } Map;
+
+Map map = { .matrix =NULL, .width =0, .height =0 };
 
 void map_unload(Map * map){
     for(int i=0; i < map->height; i++)
@@ -135,6 +70,101 @@ void map_load(Map * map, char* file_path){
 
     map_post_load(map);
 }
+//////////////////////////////////////////////
+
+void ensure(int return_code){
+  if(return_code != 0)
+    printf("error initializing SDL: %s\n", SDL_GetError());
+}
+
+int mx, my; Uint32 mbuttons;
+int mouse_left_down, mouse_left_just_down, mouse_left_down_previous=0;
+
+int events(){
+
+SDL_PumpEvents();
+mbuttons = SDL_GetMouseState(&mx, &my);
+
+mouse_left_down = mbuttons & SDL_BUTTON_LMASK;
+mouse_left_just_down = mouse_left_down && ! mouse_left_down_previous;
+mouse_left_down_previous = mouse_left_down;
+
+  SDL_Event event;
+  while (SDL_PollEvent(&event)) {
+
+    if( event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_ESCAPE ) return 0;
+
+    switch (event.type) {
+
+      case SDL_QUIT: return 0;
+
+      case SDL_KEYDOWN:
+
+        int tx =px; int ty =py;
+        switch(event.key.keysym.sym){
+          case SDLK_DOWN: ty++; break;
+          case SDLK_UP: ty--; break;
+          case SDLK_RIGHT: tx++; break;
+          case SDLK_LEFT: tx--; break;
+        }
+
+        if( tx <map.width && ty <map.height && tx >=0 && ty >=0 ){
+
+            char going=map.matrix[ty][tx];
+            if(going != '#'){
+                px=tx; py=ty;
+                if(going == 'E') map_load(&map,worlds[++worlds_current]);
+            }
+
+        }
+
+        break;
+    }
+  }
+  return 1;
+}
+
+int in_rect(int x, int y, struct SDL_Rect *r) {
+  return (x >= r->x) && (y >= r->y) &&
+          (x < r->x + r->w) && (y < r->y + r->h);
+}
+
+  int rgb[][3] = {
+  {203, 203, 203}, // Gray
+  {254, 254,  31}, // Yellow
+  {0,   255, 255}, // Cyan
+  {0,     0,   0}, // Black
+  {0,   254,  30}, // Green
+  {255,  16, 253}, // Magenta
+  {253,   3,   2}, // Red
+  {18,   14, 252}  // Blue
+  };
+  int rgb_size = sizeof rgb / sizeof rgb[0];
+
+void draw_colors(SDL_Renderer * renderer, int i_current, int view_width, int view_height){
+
+  SDL_Rect colorBar;
+  colorBar.x = 0; colorBar.y = 0; colorBar.w = view_width/rgb_size; colorBar.h = view_height;
+
+  int* color;
+  SDL_Rect rectangle;
+
+  int background_color[] = { 50, 50, 50 };
+  for(int i = -1 ; i <= i_current ; i++ ){
+    if(i==-1){
+      color = background_color;
+      SDL_Rect view={.x=0,.y=0,.w=view_width,.h=view_height};
+      rectangle = view;
+    }else{
+      color = rgb[i];
+      colorBar.x = i*colorBar.w;
+      rectangle = colorBar;
+    }
+    SDL_SetRenderDrawColor( renderer, color[0], color[1], color[2], 255 );
+    SDL_RenderFillRect( renderer, &rectangle );
+  }
+}
+///////////////////////////////////
 
 // maze/images (third app)
 int main3(int argc, char* argv[]){
@@ -164,8 +194,6 @@ int main3(int argc, char* argv[]){
     }
     texture[i] = SDL_CreateTextureFromSurface(renderer, image[i]);
     }
-
-    Map map = { .matrix=NULL, .height=0 };
 
     map_load(&map,worlds[++worlds_current]);
 

@@ -8,7 +8,7 @@
 #include <SDL2/SDL.h>
 #include <stdio.h>
 
-#define main3 main
+#define main2 main
 
 int px=0, py=0;
 
@@ -259,6 +259,8 @@ int main2(int argc, char* argv[]){
     SDL_Renderer * renderer;
     ensure( SDL_CreateWindowAndRenderer( view_width, view_height, SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE, &window, &renderer ) );
 
+    SDL_SetRenderDrawBlendMode(renderer,SDL_BLENDMODE_BLEND);
+
     double x1=0;
     double x2=0;
 
@@ -275,14 +277,14 @@ int main2(int argc, char* argv[]){
         if(x1>150) x1=0;
         SDL_Rect button1={.x=x1,.y=10,.w=50,.h=50};
         int button_color[] = { 0, 50, 50 };
-        SDL_SetRenderDrawColor( renderer, button_color[0], button_color[1], button_color[2], 255 );
+        SDL_SetRenderDrawColor( renderer, button_color[0], button_color[1], button_color[2], 100 );
         SDL_RenderFillRect( renderer, &button1 );
 
         x2+=dt*0.08;
         if(x2>150) x2=0;
         SDL_Rect button2={.x=x2,.y=10+50+10,.w=50,.h=50};
         //int button_color[] = { 0, 50, 50 };
-        SDL_SetRenderDrawColor( renderer, button_color[0], button_color[1], button_color[2], 255 );
+        SDL_SetRenderDrawColor( renderer, button_color[0], button_color[1], button_color[2], 50 );
         SDL_RenderFillRect( renderer, &button2 );
 
         SDL_RenderPresent( renderer );

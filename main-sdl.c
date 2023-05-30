@@ -8,7 +8,7 @@
 #include <SDL2/SDL.h>
 #include <stdio.h>
 
-#define main2 main
+#define main3 main
 
 int px=0, py=0;
 

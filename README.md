@@ -1,4 +1,5 @@
-# SDL2
+# SDL2 software library, Simple Direct-Media Layer: foundation layer for graphical apps, portable also across various computer systems.
+
 Cross-platform "SDL2" C API. GNU GCC &amp; GNU Makefile for Windows also. VSCode files for Task (compile with Make) and Debug (GDB debugger in VSCode, e.g. breakpoints are considered).
 
 ## marketplace.visualstudio.com

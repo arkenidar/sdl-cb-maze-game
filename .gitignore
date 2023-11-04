@@ -1,1 +1,4 @@
 *.o
+
+# cmake build
+build

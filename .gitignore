@@ -2,3 +2,6 @@
 
 # cmake build
 build
+
+#[IDE] CLion IDE
+cmake-build-debug

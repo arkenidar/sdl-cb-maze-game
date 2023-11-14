@@ -3,7 +3,7 @@
 # Visual Studio Code IDE extension for CMake
 # https://marketplace.visualstudio.com/items?itemName=ms-vscode.cmake-tools
 
-cmake_minimum_required(VERSION 3.26)
+cmake_minimum_required(VERSION 3.25)
 project( app VERSION 0.1 )
 
 file(GLOB SOURCE_FILES "*.c*" )

@@ -3,5 +3,5 @@
 # cmake build
 build
 
-#[IDE] CLion IDE
-cmake-build-debug
+#[IDE] CLion IDE, CMake build
+/build-clion/

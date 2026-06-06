@@ -7,8 +7,38 @@
 
 #include <SDL2/SDL.h>
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 #define main3 main
+
+// Resolve a relative asset path against the executable's directory so the
+// program works regardless of the current working directory it is launched
+// from. Tries, in order: next to the executable, one level up (e.g. when the
+// executable lives in build/ and assets/ sits beside it), then two levels up,
+// and finally the original relative path (current working directory) as a
+// fallback. Returns a malloc'd string; the caller must free() it.
+char * asset_path(const char * relative){
+    char * base = SDL_GetBasePath();
+    char * result = NULL;
+    if(base){
+        const char * prefixes[] = { "", "../", "../../" };
+        for(size_t i=0; i < sizeof(prefixes)/sizeof(prefixes[0]); i++){
+            size_t len = strlen(base) + strlen(prefixes[i]) + strlen(relative) + 1;
+            char * path = malloc(len);
+            sprintf(path, "%s%s%s", base, prefixes[i], relative);
+            FILE * f = fopen(path, "r");
+            if(f){ fclose(f); result = path; break; }
+            free(path);
+        }
+        SDL_free(base);
+    }
+    if(!result){
+        result = malloc(strlen(relative) + 1);
+        strcpy(result, relative);
+    }
+    return result;
+}
 
 int px=0, py=0;
 
@@ -51,7 +81,9 @@ void map_load(Map * map, char* file_path){
     map_unload(map);
     int map_width = -1; int map_height = 0;
     char * * map_matrix = (char * *) calloc(1,sizeof(char*));
-    FILE* file = fopen(file_path,"r");
+    char * full_path = asset_path(file_path);
+    FILE* file = fopen(full_path,"r");
+    free(full_path);
     char line[1001];
     while(fgets(line,1001,file)){
         if(map_width==-1) map_width = strlen(line) - 1;
@@ -187,7 +219,9 @@ int main3(int argc, char* argv[]){
     SDL_Surface * image[count];
     SDL_Texture * texture[count];
     for(int i=0; i<count; i++){
-    image[i] = SDL_LoadBMP(filename[i]);
+    char * full_path = asset_path(filename[i]);
+    image[i] = SDL_LoadBMP(full_path);
+    free(full_path);
     if(image[i]==NULL){
         printf("file-name not found: [[ %s ]]\n",filename[i]);
         return 1;

@@ -5,3 +5,6 @@ build
 
 #[IDE] CLion IDE, CMake build
 /build-clion/
+
+# symlink to assets
+mingw-linux/assets

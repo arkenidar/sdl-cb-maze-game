@@ -40,6 +40,17 @@ char * asset_path(const char * relative){
     return result;
 }
 
+// Detect whether we are running under Termux on Android. Termux's shell
+// exports TERMUX_VERSION; the PREFIX path containing "com.termux" is a
+// fallback. Used to open the maze full-screen there while keeping a normal
+// resizable window on desktop platforms.
+static int running_in_termux(void){
+    const char * v = SDL_getenv("TERMUX_VERSION");
+    if(v && v[0]) return 1;
+    const char * p = SDL_getenv("PREFIX");
+    return p && strstr(p, "com.termux") != NULL;
+}
+
 int px=0, py=0;
 
 char * worlds[] = {
@@ -208,6 +219,11 @@ int main3(int argc, char* argv[]){
     ensure( SDL_CreateWindowAndRenderer( view_width, view_height, SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE, &window, &renderer ) );
 
     SDL_SetWindowTitle(window, "mini-maze with (lib)SDL2");
+
+    // On Termux fill the screen (borderless, native resolution); the tile
+    // scaling below adapts to whatever size SDL_GetWindowSize reports.
+    if(running_in_termux())
+        SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN_DESKTOP);
 
     char * filename[4]={
         "assets/P.bmp",

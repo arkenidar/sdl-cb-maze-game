@@ -220,10 +220,22 @@ int main3(int argc, char* argv[]){
 
     SDL_SetWindowTitle(window, "mini-maze with (lib)SDL2");
 
-    // On Termux fill the screen (borderless, native resolution); the tile
-    // scaling below adapts to whatever size SDL_GetWindowSize reports.
-    if(running_in_termux())
-        SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN_DESKTOP);
+    // On Termux fill the screen with a borderless window sized to the desktop,
+    // instead of SDL_WINDOW_FULLSCREEN_DESKTOP: the real fullscreen path renders
+    // black under Termux:X11 (window is focused and takes input, but nothing is
+    // drawn). Borderless stays in the windowed render path that draws correctly.
+    // The tile scaling below adapts to whatever size SDL_GetWindowSize reports.
+    if(running_in_termux()){
+        SDL_DisplayMode dm;
+        if(SDL_GetDesktopDisplayMode(0, &dm) == 0){
+            SDL_SetWindowBordered(window, SDL_FALSE);
+            SDL_SetWindowPosition(window, 0, 0);
+            SDL_SetWindowSize(window, dm.w, dm.h);
+            SDL_Log("termux desktop=%dx%d", dm.w, dm.h);
+        } else {
+            SDL_Log("termux GetDesktopDisplayMode failed: %s", SDL_GetError());
+        }
+    }
 
     char * filename[4]={
         "assets/P.bmp",

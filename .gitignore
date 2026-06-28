@@ -8,3 +8,8 @@ build
 
 # symlink to assets
 mingw-linux/assets
+
+# Android build: downloaded SDL2 source + gradle/ndk outputs (reconstructible).
+# The Android-specific source edits live in the tracked main-sdl.c.
+android-build/
+*.apk

@@ -19,6 +19,15 @@
 // and finally the original relative path (current working directory) as a
 // fallback. Returns a malloc'd string; the caller must free() it.
 char * asset_path(const char * relative){
+#ifdef __ANDROID__
+    // On Android the assets are bundled inside the APK and are reachable only
+    // through SDL's RWops layer (the AssetManager), not the regular filesystem.
+    // Return the relative path unchanged: SDL_RWFromFile / SDL_LoadBMP resolve
+    // it against the APK's assets/ directory.
+    char * result = malloc(strlen(relative) + 1);
+    strcpy(result, relative);
+    return result;
+#else
     char * base = SDL_GetBasePath();
     char * result = NULL;
     if(base){
@@ -38,6 +47,7 @@ char * asset_path(const char * relative){
         strcpy(result, relative);
     }
     return result;
+#endif
 }
 
 // Detect whether we are running under Termux on Android. Termux's shell
@@ -93,10 +103,32 @@ void map_load(Map * map, char* file_path){
     int map_width = -1; int map_height = 0;
     char * * map_matrix = (char * *) calloc(1,sizeof(char*));
     char * full_path = asset_path(file_path);
-    FILE* file = fopen(full_path,"r");
+    // Read through SDL's RWops so the same code path works on desktop (regular
+    // files) and on Android, where assets live inside the APK and are only
+    // reachable via the AssetManager-backed RWops.
+    SDL_RWops * rw = SDL_RWFromFile(full_path, "r");
     free(full_path);
-    char line[1001];
-    while(fgets(line,1001,file)){
+    if(!rw){
+        printf("map file not found: [[ %s ]]\n", file_path);
+        map->height = 0; map->width = 0; map->matrix = map_matrix;
+        return;
+    }
+    Sint64 size = SDL_RWsize(rw);
+    char * buffer = malloc(size + 1);
+    SDL_RWread(rw, buffer, 1, (size_t)size);
+    buffer[size] = '\0';
+    SDL_RWclose(rw);
+
+    // Walk the buffer line by line, mirroring the old fgets() loop: each line
+    // keeps its trailing '\n' (when present) so strlen()-1 still yields width.
+    char line[1024];
+    char * cursor = buffer;
+    while(*cursor){
+        int n = 0;
+        while(*cursor && *cursor != '\n' && n < 1022) line[n++] = *cursor++;
+        if(*cursor == '\n'){ line[n++] = *cursor++; }
+        line[n] = '\0';
+
         if(map_width==-1) map_width = strlen(line) - 1;
         line[map_width]='\0';
 
@@ -106,6 +138,7 @@ void map_load(Map * map, char* file_path){
         map_matrix[map_height - 1] = calloc(map_width+1,sizeof(char));
         strcpy(map_matrix[map_height - 1],line);
     }
+    free(buffer);
 
     map->height = map_height;
     map->width = map_width;
@@ -219,6 +252,17 @@ int main3(int argc, char* argv[]){
     ensure( SDL_CreateWindowAndRenderer( view_width, view_height, SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE, &window, &renderer ) );
 
     SDL_SetWindowTitle(window, "mini-maze with (lib)SDL2");
+
+#ifdef __ANDROID__
+    // On the native Android APK, the OS status bar (clock, battery, …) is drawn
+    // on top of the window, covering the top tile row. Switching the window to
+    // fullscreen makes SDL put the activity into immersive sticky mode, which
+    // hides both the status and navigation bars so the whole screen is drawable.
+    // The tile scaling below adapts to whatever size SDL_GetWindowSize reports.
+    if(SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN_DESKTOP) != 0){
+        SDL_Log("android SetWindowFullscreen failed: %s", SDL_GetError());
+    }
+#endif
 
     // On Termux fill the screen with a borderless window sized to the desktop,
     // instead of SDL_WINDOW_FULLSCREEN_DESKTOP: the real fullscreen path renders

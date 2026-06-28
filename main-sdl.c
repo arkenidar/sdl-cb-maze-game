@@ -233,7 +233,13 @@ int main3(int argc, char* argv[]){
     map_load(&map,worlds[++worlds_current]);
 
     while(events()){
-        const int tile_size=32;
+        // Scale tiles to fill the (resizable) window, keeping them square and
+        // anchored top-left: pick the tighter of the width/height constraints.
+        SDL_GetWindowSize(window, &view_width, &view_height);
+        int tile_size = view_width / map.width;
+        int th = view_height / map.height;
+        if(th < tile_size) tile_size = th;
+        if(tile_size < 1) tile_size = 1; // guard against zero on tiny windows
 
         if(mouse_left_down){
             int tx,ty;

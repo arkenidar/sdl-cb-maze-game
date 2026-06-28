@@ -4,7 +4,11 @@
 # https://marketplace.visualstudio.com/items?itemName=ms-vscode.cmake-tools
 
 cmake_minimum_required(VERSION 3.20)
-project( app VERSION 0.1 )
+project( app VERSION 0.1 LANGUAGES C )
+
+# Require C99 (for-loop scoped variables, // comments, mixed declarations)
+set(CMAKE_C_STANDARD 99)
+set(CMAKE_C_STANDARD_REQUIRED ON)
 
 file(GLOB SOURCE_FILES "*.c*" )
 add_executable(app ${SOURCE_FILES})

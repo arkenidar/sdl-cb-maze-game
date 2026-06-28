@@ -130,7 +130,7 @@ mouse_left_down_previous = mouse_left_down;
 
       case SDL_QUIT: return 0;
 
-      case SDL_KEYDOWN:
+      case SDL_KEYDOWN: {
 
         int tx =px; int ty =py;
         switch(event.key.keysym.sym){
@@ -151,6 +151,7 @@ mouse_left_down_previous = mouse_left_down;
         }
 
         break;
+      }
     }
   }
   return 1;

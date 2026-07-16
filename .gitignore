@@ -13,3 +13,9 @@ mingw-linux/assets
 # The Android-specific source edits live in the tracked main-sdl.c.
 android-build/
 *.apk
+
+# https://www.codeblocks.org/
+*.layout
+*.depend
+/cb-mswindows/bin
+/cb-linux/bin

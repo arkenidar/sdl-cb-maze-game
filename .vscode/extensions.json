@@ -1,0 +1,9 @@
+{
+    "recommendations": [
+        "ms-vscode.cpptools",
+        "carlos-algms.make-task-provider",
+        "ms-vscode.cmake-tools",
+        "twxs.cmake",
+        "sumneko.lua"
+    ]
+}

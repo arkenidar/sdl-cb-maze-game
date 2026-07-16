@@ -5,6 +5,7 @@
             "name": "(gdb) Launch app in DEBUG (compile with GCC -g)",
             "type": "cppdbg",
             "request": "launch",
+            "preLaunchTask": "make: produce_executable",
             "program": "${workspaceFolder}/app",
             "args": [],
             "stopAtEntry": false,

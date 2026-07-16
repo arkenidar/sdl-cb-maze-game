@@ -19,3 +19,6 @@ android-build/
 *.depend
 /cb-mswindows/bin
 /cb-linux/bin
+
+# built via make, but not tracked in git
+app

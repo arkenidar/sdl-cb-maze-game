@@ -61,6 +61,23 @@ static int running_in_termux(void){
     return p && strstr(p, "com.termux") != NULL;
 }
 
+// Detect whether we are running inside the CXXDroid app (package
+// ru.iiec.cxxdroid), which also compiles with __ANDROID__ defined. The
+// program runs inside CXXDroid's sandbox, so its internal storage path
+// contains the package name. There the APK fullscreen path leaves a black
+// status-bar strip over the top of the content, so the plain windowed path
+// is kept instead.
+// Only compiled on Android: the sole call site is in the __ANDROID__ block
+// below, and defining it elsewhere would trigger -Wunused-function.
+#ifdef __ANDROID__
+static int running_in_cxxdroid(void){
+    const char * p = SDL_AndroidGetInternalStoragePath();
+    if(p && strstr(p, "cxxdroid")) return 1;
+    const char * home = SDL_getenv("HOME");
+    return home && strstr(home, "cxxdroid") != NULL;
+}
+#endif
+
 int px=0, py=0;
 
 char * worlds[] = {
@@ -259,10 +276,11 @@ int main3(int argc, char* argv[]){
     // fullscreen makes SDL put the activity into immersive sticky mode, which
     // hides both the status and navigation bars so the whole screen is drawable.
     // The tile scaling below adapts to whatever size SDL_GetWindowSize reports.
-    // Skip under Termux: __ANDROID__ is also defined by Termux's clang, but
-    // fullscreen renders black under Termux:X11 — the borderless path below
-    // handles Termux instead.
-    if(!running_in_termux()){
+    // Skip under Termux and CXXDroid: __ANDROID__ is also defined by their
+    // clang, but fullscreen renders black under Termux:X11 (the borderless
+    // path below handles Termux) and leaves a black status-bar strip over the
+    // content in CXXDroid, where the plain resizable window works fine.
+    if(!running_in_termux() && !running_in_cxxdroid()){
         if(SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN_DESKTOP) != 0){
             SDL_Log("android SetWindowFullscreen failed: %s", SDL_GetError());
         }

@@ -2,12 +2,19 @@
 	"version": "2.0.0",
 	"tasks": [
 		{
-			"type": "make",
-			"targetName": "produce_executable",
-			"makeFileRelativePath": "Makefile",
-			"problemMatcher": [],
+			"type": "shell",
+			"command": "make",
+			"args": [
+				"produce_executable"
+			],
+			"options": {
+				"cwd": "${workspaceFolder}"
+			},
+			"problemMatcher": [
+				"$gcc"
+			],
 			"label": "make: produce_executable",
-			"detail": "./Makefile",
+			"detail": "make produce_executable (./Makefile)",
 			"group": {
 				"kind": "build",
 				"isDefault": true

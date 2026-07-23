@@ -10,6 +10,14 @@
 #include <stdlib.h>
 #include <string.h>
 
+// APP_ANDROID_APK marks a real Android APK build (SDL activity + JNI glue,
+// assets bundled in the APK). Plain __ANDROID__ cannot be used for that:
+// Termux's and CXXDroid's clang also target bionic and define it, yet their
+// builds are ordinary executables whose SDL2 has no Android JNI bridge, so
+// APK-only SDL calls fail to link there. No build in this repo defines the
+// macro today; a future APK project must compile with -DAPP_ANDROID_APK
+// (e.g. target_compile_definitions(... APP_ANDROID_APK) in its CMakeLists).
+
 #define main3 main
 
 // Resolve a relative asset path against the executable's directory so the
@@ -19,7 +27,7 @@
 // and finally the original relative path (current working directory) as a
 // fallback. Returns a malloc'd string; the caller must free() it.
 char * asset_path(const char * relative){
-#ifdef __ANDROID__
+#ifdef APP_ANDROID_APK
     // On Android the assets are bundled inside the APK and are reachable only
     // through SDL's RWops layer (the AssetManager), not the regular filesystem.
     // Return the relative path unchanged: SDL_RWFromFile / SDL_LoadBMP resolve
@@ -60,23 +68,6 @@ static int running_in_termux(void){
     const char * p = SDL_getenv("PREFIX");
     return p && strstr(p, "com.termux") != NULL;
 }
-
-// Detect whether we are running inside the CXXDroid app (package
-// ru.iiec.cxxdroid), which also compiles with __ANDROID__ defined. The
-// program runs inside CXXDroid's sandbox, so its internal storage path
-// contains the package name. There the APK fullscreen path leaves a black
-// status-bar strip over the top of the content, so the plain windowed path
-// is kept instead.
-// Only compiled on Android: the sole call site is in the __ANDROID__ block
-// below, and defining it elsewhere would trigger -Wunused-function.
-#ifdef __ANDROID__
-static int running_in_cxxdroid(void){
-    const char * p = SDL_AndroidGetInternalStoragePath();
-    if(p && strstr(p, "cxxdroid")) return 1;
-    const char * home = SDL_getenv("HOME");
-    return home && strstr(home, "cxxdroid") != NULL;
-}
-#endif
 
 int px=0, py=0;
 
@@ -270,20 +261,19 @@ int main3(int argc, char* argv[]){
 
     SDL_SetWindowTitle(window, "mini-maze with (lib)SDL2");
 
-#ifdef __ANDROID__
+#ifdef APP_ANDROID_APK
     // On the native Android APK, the OS status bar (clock, battery, …) is drawn
     // on top of the window, covering the top tile row. Switching the window to
     // fullscreen makes SDL put the activity into immersive sticky mode, which
     // hides both the status and navigation bars so the whole screen is drawable.
     // The tile scaling below adapts to whatever size SDL_GetWindowSize reports.
-    // Skip under Termux and CXXDroid: __ANDROID__ is also defined by their
-    // clang, but fullscreen renders black under Termux:X11 (the borderless
-    // path below handles Termux) and leaves a black status-bar strip over the
-    // content in CXXDroid, where the plain resizable window works fine.
-    if(!running_in_termux() && !running_in_cxxdroid()){
-        if(SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN_DESKTOP) != 0){
-            SDL_Log("android SetWindowFullscreen failed: %s", SDL_GetError());
-        }
+    // Gated on APP_ANDROID_APK rather than __ANDROID__: Termux and CXXDroid
+    // builds also define __ANDROID__ but must not take this path — fullscreen
+    // renders black under Termux:X11 (the borderless path below handles it)
+    // and leaves a black status-bar strip in CXXDroid, where the plain
+    // resizable window works fine.
+    if(SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN_DESKTOP) != 0){
+        SDL_Log("android SetWindowFullscreen failed: %s", SDL_GetError());
     }
 #endif
 

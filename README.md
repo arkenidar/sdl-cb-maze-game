@@ -44,3 +44,11 @@ Shell scripts to be used in Linux to produce Linux apps, via GCC (notably with s
 
 - /sh-mswindows
 Shell scripts to be used in Microsoft Windows to produce Microsoft Windows apps, via GCC/MinGW/MSYS (notably with support for libSDL2)
+
+***
+
+# Android notes (Termux, CXXDroid, APK)
+
+Building in **Termux** or **CXXDroid** works with the normal commands (e.g. `cc *.c $(sdl2-config --cflags --libs)`): those produce ordinary executables, even though their clang defines `__ANDROID__`.
+
+Android-APK-only code in `main-sdl.c` (loading assets through SDL RWops from the APK, immersive fullscreen) is gated on the macro `APP_ANDROID_APK`, **not** on `__ANDROID__` — Termux/CXXDroid also define `__ANDROID__` but their SDL2 has no Android JNI glue, so APK-only SDL calls would fail to link there. No build in this repository defines `APP_ANDROID_APK`; a future Android APK project must compile this source with `-DAPP_ANDROID_APK` (e.g. `target_compile_definitions(... APP_ANDROID_APK)` in its CMakeLists) to enable those paths.

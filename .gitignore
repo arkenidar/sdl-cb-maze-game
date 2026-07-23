@@ -9,9 +9,9 @@ build
 # symlink to assets
 mingw-linux/assets
 
-# Android build: downloaded SDL2 source + gradle/ndk outputs (reconstructible).
-# The Android-specific source edits live in the tracked main-sdl.c.
-android-build/
+# Android APK build lives in /android and its project files are tracked;
+# only the downloaded SDL2 source and build outputs are ignored — see
+# android/.gitignore. Built APKs stay untracked.
 *.apk
 
 # https://www.codeblocks.org/
@@ -20,5 +20,6 @@ android-build/
 /cb-mswindows/bin
 /cb-linux/bin
 
-# built via make, but not tracked in git
-app
+# built via make, but not tracked in git (root only: android/app/ is a
+# tracked Gradle module)
+/app

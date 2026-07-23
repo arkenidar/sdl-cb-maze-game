@@ -45,10 +45,26 @@ Shell scripts to be used in Linux to produce Linux apps, via GCC (notably with s
 - /sh-mswindows
 Shell scripts to be used in Microsoft Windows to produce Microsoft Windows apps, via GCC/MinGW/MSYS (notably with support for libSDL2)
 
+- /android
+Gradle + Android NDK project to be used in Linux (or any OS with an Android SDK) to produce an Android APK (builds libSDL2 from source)
+
 ***
 
 # Android notes (Termux, CXXDroid, APK)
 
 Building in **Termux** or **CXXDroid** works with the normal commands (e.g. `cc *.c $(sdl2-config --cflags --libs)`): those produce ordinary executables, even though their clang defines `__ANDROID__`.
 
-Android-APK-only code in `main-sdl.c` (loading assets through SDL RWops from the APK, immersive fullscreen) is gated on the macro `APP_ANDROID_APK`, **not** on `__ANDROID__` — Termux/CXXDroid also define `__ANDROID__` but their SDL2 has no Android JNI glue, so APK-only SDL calls would fail to link there. No build in this repository defines `APP_ANDROID_APK`; a future Android APK project must compile this source with `-DAPP_ANDROID_APK` (e.g. `target_compile_definitions(... APP_ANDROID_APK)` in its CMakeLists) to enable those paths.
+Android-APK-only code in `main-sdl.c` (loading assets through SDL RWops from the APK, `SDL_main`, immersive fullscreen) is gated on the macro `APP_ANDROID_APK`, **not** on `__ANDROID__` — Termux/CXXDroid also define `__ANDROID__` but their SDL2 has no Android JNI glue, so APK-only SDL calls would fail to link there. The `/android` Gradle project is the only build that defines `APP_ANDROID_APK` (in `android/app/jni/CMakeLists.txt`).
+
+## Building the Android APK
+
+Prerequisites: JDK 17+ and an Android SDK with NDK, CMake, platform 34 and platform-tools installed (via Android Studio, or headless with `sdkmanager`). Point the build at the SDK with the `ANDROID_HOME` environment variable or `android/local.properties` (`sdk.dir=...`).
+
+```sh
+cd android
+./setup-sdl.sh          # once per clone: downloads SDL2 source + Java glue (version pinned in the script)
+./gradlew assembleDebug # -> app/build/outputs/apk/debug/app-debug.apk
+adb install -r app/build/outputs/apk/debug/app-debug.apk
+```
+
+The APK bundles `assets/` automatically (staged by a Gradle task, not duplicated in git) and touch input works out of the box (SDL maps touch to mouse events; tap an adjacent tile to move). To upgrade SDL2, edit `SDL_VERSION` in `android/setup-sdl.sh` and re-run it — it syncs the native library and the Java glue from the same release so they cannot drift apart.

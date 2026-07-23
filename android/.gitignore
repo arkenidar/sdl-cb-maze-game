@@ -1,0 +1,11 @@
+# Produced by setup-sdl.sh (re-run it after a fresh clone):
+SDL2-*.tar.gz
+app/jni/SDL/
+app/src/main/java/org/libsdl/
+
+# Gradle / Android build outputs
+.gradle/
+build/
+app/build/
+app/.cxx/
+local.properties

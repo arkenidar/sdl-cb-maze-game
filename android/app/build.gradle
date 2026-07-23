@@ -1,0 +1,48 @@
+apply plugin: 'com.android.application'
+
+android {
+    namespace "org.arkenidar.mazegame"
+    compileSdkVersion 34
+    defaultConfig {
+        applicationId "org.arkenidar.mazegame"
+        minSdkVersion 21          // NDK r30 floor; SDL 2.30.x itself needs only 19
+        targetSdkVersion 34
+        versionCode 1
+        versionName "1.0"
+        externalNativeBuild {
+            cmake {
+                arguments "-DANDROID_STL=c++_static"
+            }
+        }
+        ndk {
+            abiFilters 'arm64-v8a', 'armeabi-v7a', 'x86_64'   // x86_64 for the emulator
+        }
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+    externalNativeBuild {
+        cmake {
+            path 'jni/CMakeLists.txt'
+        }
+    }
+    lint {
+        abortOnError false
+    }
+
+    // The game opens assets with paths like "assets/P.bmp" (asset_path()
+    // returns them unchanged under APP_ANDROID_APK), so the repo's assets/
+    // directory must sit one level below the APK asset root: assets/assets/...
+    // Staged via a copy task to avoid duplicating the files in git.
+    sourceSets.main.assets.srcDirs += "$buildDir/staged-assets"
+}
+
+tasks.register('stageAssets', Copy) {
+    from "${rootDir}/../assets"
+    into "$buildDir/staged-assets/assets"
+    exclude 'README.txt'
+}
+preBuild.dependsOn 'stageAssets'

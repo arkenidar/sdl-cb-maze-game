@@ -1,0 +1,22 @@
+// Top-level build file. Based on SDL2's android-project template, with the
+// AGP/Gradle pair bumped (8.5.2 / wrapper 8.7) so the build runs on JDK 21.
+buildscript {
+    repositories {
+        mavenCentral()
+        google()
+    }
+    dependencies {
+        classpath 'com.android.tools.build:gradle:8.5.2'
+    }
+}
+
+allprojects {
+    repositories {
+        mavenCentral()
+        google()
+    }
+}
+
+task clean(type: Delete) {
+    delete rootProject.buildDir
+}

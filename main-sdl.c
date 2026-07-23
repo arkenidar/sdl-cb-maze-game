@@ -5,7 +5,17 @@
 // cd ~/src/sdl-tutorial/ && cc *.c $(pkg-config --cflags --libs sdl2 SDL2_image) && ./a.out && echo STOP
 //https://www.geeksforgeeks.org/sdl-library-in-c-c-with-examples/
 
+#ifdef APP_ANDROID_APK
+// Building against the SDL2 source tree (android/app/jni/SDL) exports the
+// headers without the SDL2/ prefix. SDL_main.h is mandatory in the file that
+// defines main() on Android: it remaps main to SDL_main, which SDL's JNI glue
+// (SDLActivity) calls. It must appear before the "#define main3 main" below so
+// main3 expands through main to SDL_main.
+#include <SDL.h>
+#include <SDL_main.h>
+#else
 #include <SDL2/SDL.h>
+#endif
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>

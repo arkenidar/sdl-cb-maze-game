@@ -259,8 +259,13 @@ int main3(int argc, char* argv[]){
     // fullscreen makes SDL put the activity into immersive sticky mode, which
     // hides both the status and navigation bars so the whole screen is drawable.
     // The tile scaling below adapts to whatever size SDL_GetWindowSize reports.
-    if(SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN_DESKTOP) != 0){
-        SDL_Log("android SetWindowFullscreen failed: %s", SDL_GetError());
+    // Skip under Termux: __ANDROID__ is also defined by Termux's clang, but
+    // fullscreen renders black under Termux:X11 — the borderless path below
+    // handles Termux instead.
+    if(!running_in_termux()){
+        if(SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN_DESKTOP) != 0){
+            SDL_Log("android SetWindowFullscreen failed: %s", SDL_GetError());
+        }
     }
 #endif
 

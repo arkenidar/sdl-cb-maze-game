@@ -287,20 +287,30 @@ int main3(int argc, char* argv[]){
     }
 #endif
 
-    // On Termux fill the screen with a borderless window sized to the desktop,
-    // instead of SDL_WINDOW_FULLSCREEN_DESKTOP: the real fullscreen path renders
-    // black under Termux:X11 (window is focused and takes input, but nothing is
+    // On Termux fill the screen with a borderless window, instead of
+    // SDL_WINDOW_FULLSCREEN_DESKTOP: the real fullscreen path renders black
+    // under Termux:X11 (window is focused and takes input, but nothing is
     // drawn). Borderless stays in the windowed render path that draws correctly.
+    // Size to the display's usable bounds rather than the full desktop mode so
+    // the window starts below the Android status bar, which Termux:X11 draws
+    // (semi-transparently) on top of anything placed under it.
     // The tile scaling below adapts to whatever size SDL_GetWindowSize reports.
     if(running_in_termux()){
-        SDL_DisplayMode dm;
-        if(SDL_GetDesktopDisplayMode(0, &dm) == 0){
+        SDL_Rect ub;
+        if(SDL_GetDisplayUsableBounds(0, &ub) == 0){
             SDL_SetWindowBordered(window, SDL_FALSE);
-            SDL_SetWindowPosition(window, 0, 0);
-            SDL_SetWindowSize(window, dm.w, dm.h);
-            SDL_Log("termux desktop=%dx%d", dm.w, dm.h);
+            SDL_SetWindowPosition(window, ub.x, ub.y);
+            SDL_SetWindowSize(window, ub.w, ub.h);
+            SDL_Log("termux usable bounds=%d,%d %dx%d", ub.x, ub.y, ub.w, ub.h);
         } else {
-            SDL_Log("termux GetDesktopDisplayMode failed: %s", SDL_GetError());
+            SDL_Log("termux GetDisplayUsableBounds failed: %s", SDL_GetError());
+            SDL_DisplayMode dm;
+            if(SDL_GetDesktopDisplayMode(0, &dm) == 0){
+                SDL_SetWindowBordered(window, SDL_FALSE);
+                SDL_SetWindowPosition(window, 0, 0);
+                SDL_SetWindowSize(window, dm.w, dm.h);
+                SDL_Log("termux desktop=%dx%d", dm.w, dm.h);
+            }
         }
     }
 
